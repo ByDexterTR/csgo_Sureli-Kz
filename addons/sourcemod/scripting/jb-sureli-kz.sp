@@ -105,12 +105,11 @@ public Action Cmd_Skz(int client, int args)
 	}
 	char time[20];
 	GetCmdArg(1, time, 20);
-	if (StringToInt(time) <= 0)
+	if (skztime = (StringToInt(time) <= 0))
 	{
 		ReplyToCommand(client, "[SM] Sıfırdan büyük bir sayı girmelisin.");
 		return Plugin_Handled;
 	}
-	skztime = StringToInt(time);
 	StyleMenu().Display(client, MENU_TIME_FOREVER);
 	return Plugin_Handled;
 }
