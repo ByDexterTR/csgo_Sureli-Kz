@@ -78,7 +78,7 @@ public void OnMapStart()
 
 public Action Cmd_Skz0(int client, int args)
 {
-	if (!warden_iswarden(client) || !CheckCommandAccess(client, "skzstart_flag", ADMFLAG_GENERIC))
+	if (!warden_iswarden(client) || !CheckCommandAccess(client, "skzstart_flag", ADMFLAG_ROOT))
 	{
 		ReplyToCommand(client, "[SM] Bu komuta erişiminiz yok.");
 		return Plugin_Handled;
@@ -98,18 +98,19 @@ public Action Cmd_Skz0(int client, int args)
 
 public Action Cmd_Skz(int client, int args)
 {
-	if (!warden_iswarden(client) || !CheckCommandAccess(client, "skzstart_flag", ADMFLAG_GENERIC))
+	if (!warden_iswarden(client) || !CheckCommandAccess(client, "skzstart_flag", ADMFLAG_ROOT))
 	{
 		ReplyToCommand(client, "[SM] Bu komuta erişiminiz yok.");
 		return Plugin_Handled;
 	}
 	char time[20];
 	GetCmdArg(1, time, 20);
-	if (skztime = (StringToInt(time) <= 0))
+	if (StringToInt(time) <= 0)
 	{
 		ReplyToCommand(client, "[SM] Sıfırdan büyük bir sayı girmelisin.");
 		return Plugin_Handled;
 	}
+	skztime = StringToInt(time);
 	StyleMenu().Display(client, MENU_TIME_FOREVER);
 	return Plugin_Handled;
 }
