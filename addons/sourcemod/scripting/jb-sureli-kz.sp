@@ -78,7 +78,7 @@ public void OnMapStart()
 
 public Action Cmd_Skz0(int client, int args)
 {
-	if (!warden_iswarden(client) || !CheckCommandAccess(client, "skzstart_flag", ADMFLAG_ROOT))
+	if (!warden_iswarden(client) && !CheckCommandAccess(client, "skzstart_flag", ADMFLAG_ROOT))
 	{
 		ReplyToCommand(client, "[SM] Bu komuta erişiminiz yok.");
 		return Plugin_Handled;
@@ -93,12 +93,14 @@ public Action Cmd_Skz0(int client, int args)
 	if (g_timer != null)
 		delete g_timer;
 	
+	PrintCenterTextAll("SKZ <font color='#ff0000'>İPTAL EDİLDİ</font>");
+	PrintToChatAll("[SM] \x10%N tarafından \x0ESKZ \x01iptal edildi!", client);
 	return Plugin_Handled;
 }
 
 public Action Cmd_Skz(int client, int args)
 {
-	if (!warden_iswarden(client) || !CheckCommandAccess(client, "skzstart_flag", ADMFLAG_ROOT))
+	if (!warden_iswarden(client) && !CheckCommandAccess(client, "skzstart_flag", ADMFLAG_ROOT))
 	{
 		ReplyToCommand(client, "[SM] Bu komuta erişiminiz yok.");
 		return Plugin_Handled;
@@ -208,8 +210,8 @@ public int Style_Handle(Menu menu, MenuAction action, int client, int position)
 					PrepareAndTeleport(OrtaCoords);
 					PrintToChatAll("[SM] \x10%N tarafından \x04%d Saniyelik \x0ESKZ \x01başlatıldı!", client, skztime);
 					EmitSoundToAllAny("bydexter/yaris/3.mp3", SOUND_FROM_PLAYER, 1, 50);
-					PrintCenterTextAll("SKZ Başlamasına <font color='#34eb40'>3</font>");
-					g_timer = CreateTimer(1.0, Go2, _, TIMER_FLAG_NO_MAPCHANGE);
+					PrintCenterTextAll("SKZ Başlamasına: <font color='#00bbff'>3 saniye</font>");
+					g_timer = CreateTimer(1.0, Go2, 2, TIMER_FLAG_NO_MAPCHANGE);
 				}
 			}
 			case 1:
@@ -227,7 +229,8 @@ public int Style_Handle(Menu menu, MenuAction action, int client, int position)
 					PrepareAndTeleport(LaneCoords);
 					PrintToChatAll("[SM] \x10%N tarafından \x04%d Saniyelik \x0ESKZ \x01başlatıldı!", client, skztime);
 					EmitSoundToAllAny("bydexter/yaris/3.mp3", SOUND_FROM_PLAYER, 1, 50);
-					g_timer = CreateTimer(1.0, Go2, _, TIMER_FLAG_NO_MAPCHANGE);
+					PrintCenterTextAll("SKZ Başlamasına: <font color='#00bbff'>3 saniye</font>");
+					g_timer = CreateTimer(1.0, Go2, 2, TIMER_FLAG_NO_MAPCHANGE);
 				}
 			}
 			case 2:
@@ -241,7 +244,8 @@ public int Style_Handle(Menu menu, MenuAction action, int client, int position)
 				PrepareAndTeleport(Coords);
 				PrintToChatAll("[SM] \x10%N tarafından \x04%d Saniyelik \x0ESKZ \x01başlatıldı!", client, skztime);
 				EmitSoundToAllAny("bydexter/yaris/3.mp3", SOUND_FROM_PLAYER, 1, 50);
-				g_timer = CreateTimer(1.0, Go2, _, TIMER_FLAG_NO_MAPCHANGE);
+				PrintCenterTextAll("SKZ Başlamasına: <font color='#00bbff'>3 saniye</font>");
+				g_timer = CreateTimer(1.0, Go2, 2, TIMER_FLAG_NO_MAPCHANGE);
 			}
 		}
 	}
@@ -333,6 +337,7 @@ public int BunnyTimesMenu_Handle(Menu menu, MenuAction action, int client, int p
 
 public Action BunnyCountDown(Handle timer, any data)
 {
+	PrintCenterTextAll("Kapıların Açılmasına: <font color='#00bbff'>%d saniye</font>", bunnytime);
 	if (bunnytime <= 0)
 	{
 		char classname[32];
@@ -349,53 +354,59 @@ public Action BunnyCountDown(Handle timer, any data)
 			gonnaslay[i] = true;
 			FinishTime[i] = GetEngineTime();
 		}
+		EmitSoundToAllAny("bydexter/yaris/gogo.mp3", SOUND_FROM_PLAYER, 1, 50);
+		PrintCenterTextAll("SKZ <font color='#ffbb00'>BAŞLADI</font>");
 		g_timer = CreateTimer(1.0, SlayNotInZone, _, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
 		return Plugin_Stop;
 	}
-	PrintCenterTextAll("Kapıların Açılmasına <font color='#34eb40'>%d</font>", bunnytime);
+	else if (bunnytime <= 3)
+	{
+		char songname[24];
+		Format(songname, 24, "bydexter/yaris/%d.mp3", bunnytime);
+		EmitSoundToAllAny(songname, SOUND_FROM_PLAYER, 1, 50);
+	}
 	bunnytime--;
 	return Plugin_Continue;
 }
 
-public Action CountDownTimer(Handle timer, any data)
+public Action Go2(Handle timer, any number)
 {
-	LoopAllTerroristPlayers(i)
+	PrintCenterTextAll("SKZ Başlamasına: <font color='#00bbff'>%d saniye</font>", number);
+	if (g_timer != null)
+		g_timer = null;
+	
+	if (number == 2)
 	{
-		SetEntityMoveType(i, MOVETYPE_WALK);
-		FinishTime[i] = GetEngineTime();
+		EmitSoundToAllAny("bydexter/yaris/2.mp3", SOUND_FROM_PLAYER, 1, 50);
+		g_timer = CreateTimer(1.0, Go2, 1, TIMER_FLAG_NO_MAPCHANGE);
 	}
-	EmitSoundToAllAny("bydexter/yaris/gogo.mp3", SOUND_FROM_PLAYER, 1, 50);
-	PrintCenterTextAll("SKZ <font color='#34eb40'>Başladı</font>");
-	g_timer = CreateTimer(1.0, SlayNotInZone, _, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
-	return Plugin_Stop;
-}
-
-public Action Go2(Handle timer, any data)
-{
-	if (g_timer != null)
-		g_timer = null;
-	EmitSoundToAllAny("bydexter/yaris/2.mp3", SOUND_FROM_PLAYER, 1, 50);
-	g_timer = CreateTimer(1.0, Go1, _, TIMER_FLAG_NO_MAPCHANGE);
-	PrintCenterTextAll("SKZ Başlamasına <font color='#34eb40'>2</font>");
-	return Plugin_Stop;
-}
-
-public Action Go1(Handle timer, any data)
-{
-	if (g_timer != null)
-		g_timer = null;
-	EmitSoundToAllAny("bydexter/yaris/1.mp3", SOUND_FROM_PLAYER, 1, 50);
-	g_timer = CreateTimer(1.0, CountDownTimer, _, TIMER_FLAG_NO_MAPCHANGE);
-	PrintCenterTextAll("SKZ Başlamasına <font color='#34eb40'>1</font>");
+	else if (number == 1)
+	{
+		EmitSoundToAllAny("bydexter/yaris/1.mp3", SOUND_FROM_PLAYER, 1, 50);
+		g_timer = CreateTimer(1.0, Go2, 0, TIMER_FLAG_NO_MAPCHANGE);
+	}
+	else
+	{
+		LoopAllTerroristPlayers(i)
+		{
+			SetEntityMoveType(i, MOVETYPE_WALK);
+			FinishTime[i] = GetEngineTime();
+		}
+		EmitSoundToAllAny("bydexter/yaris/gogo.mp3", SOUND_FROM_PLAYER, 1, 50);
+		PrintCenterTextAll("SKZ <font color='#ffbb00'>BAŞLADI</font>");
+		g_timer = CreateTimer(1.0, SlayNotInZone, _, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
+	}
 	return Plugin_Stop;
 }
 
 public Action SlayNotInZone(Handle timer, any data)
 {
+	PrintCenterTextAll("Slay Atılmasına: <font color='#00bbff'>%d saniye</font>", skztime);
 	if (skztime <= 0)
 	{
 		if (finishpos == 0)
 		{
+			PrintCenterTextAll("<font color='#ffbb00'>Kimse</font><font color='#00bbff'>!</font>");
 			PrintToChatAll("[SM] Kimse yapamadı!");
 		}
 		else
@@ -406,7 +417,6 @@ public Action SlayNotInZone(Handle timer, any data)
 		FinishGame();
 		return Plugin_Stop;
 	}
-	PrintCenterTextAll("Slay Atılmasına <font color='#34eb40'>%d</font>", skztime);
 	skztime--;
 	return Plugin_Continue;
 }
